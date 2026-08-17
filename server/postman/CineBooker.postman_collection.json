@@ -1,0 +1,236 @@
+{
+  "info": {
+    "name": "CineBooker API (MySQL)",
+    "_postman_id": "cinebooker-mysql-collection",
+    "description": "Full API collection for the CineBooker MySQL backend. Set {{baseUrl}} (default http://localhost:8080). Auth endpoints save the JWT to {{token}}/{{adminToken}} automatically via test scripts.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "showtimeId", "value": "1" },
+    { "key": "orderId", "value": "" },
+    { "key": "ticketId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"demo_{{$timestamp}}\",\n  \"email\": \"demo_{{$timestamp}}@test.com\",\n  \"password\": \"password123\"\n}" }
+          }
+        },
+        {
+          "name": "Login (user)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "const j = pm.response.json();",
+            "if (j.token) pm.collectionVariables.set('token', j.token);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"user\",\n  \"password\": \"user123\"\n}" }
+          }
+        },
+        {
+          "name": "Login (admin)",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "const j = pm.response.json();",
+            "if (j.token) pm.collectionVariables.set('adminToken', j.token);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}" }
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/auth/me" }
+        },
+        {
+          "name": "My Tickets (auth/tickets)",
+          "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/auth/tickets" }
+        }
+      ]
+    },
+    {
+      "name": "Catalog",
+      "item": [
+        { "name": "List Movies", "request": { "method": "GET", "url": "{{baseUrl}}/movie" } },
+        { "name": "List Cinemas", "request": { "method": "GET", "url": "{{baseUrl}}/cinema" } },
+        { "name": "List Theaters", "request": { "method": "GET", "url": "{{baseUrl}}/theater" } },
+        { "name": "List Showtimes", "request": { "method": "GET", "url": "{{baseUrl}}/showtime" } },
+        { "name": "Get Showtime by id", "request": { "method": "GET", "url": "{{baseUrl}}/showtime/{{showtimeId}}" } }
+      ]
+    },
+    {
+      "name": "Seat Locks",
+      "item": [
+        {
+          "name": "Lock Seats",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/seatlock/lock",
+            "body": { "mode": "raw", "raw": "{\n  \"showtimeId\": {{showtimeId}},\n  \"seats\": [\"C5\", \"C6\"]\n}" }
+          }
+        },
+        {
+          "name": "Verify Locks",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/seatlock/verify",
+            "body": { "mode": "raw", "raw": "{\n  \"showtimeId\": {{showtimeId}},\n  \"seats\": [\"C5\", \"C6\"]\n}" }
+          }
+        },
+        { "name": "Get Locked Seats", "request": { "method": "GET", "url": "{{baseUrl}}/seatlock/{{showtimeId}}" } },
+        {
+          "name": "Unlock Seats",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/seatlock/unlock",
+            "body": { "mode": "raw", "raw": "{\n  \"showtimeId\": {{showtimeId}}\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Create Order",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "const j = pm.response.json();",
+            "if (j.data && j.data.orderId) pm.collectionVariables.set('orderId', j.data.orderId);"
+          ] } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/payment/create-order",
+            "body": { "mode": "raw", "raw": "{\n  \"showtimeId\": {{showtimeId}},\n  \"seats\": [\"C5\", \"C6\"]\n}" }
+          }
+        },
+        {
+          "name": "Verify Payment (needs real Razorpay signature)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/payment/verify",
+            "body": { "mode": "raw", "raw": "{\n  \"razorpay_order_id\": \"{{orderId}}\",\n  \"razorpay_payment_id\": \"pay_XXXX\",\n  \"razorpay_signature\": \"<hmac>\"\n}" }
+          }
+        },
+        { "name": "Payment Status", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/payment/status/{{orderId}}" } },
+        {
+          "name": "Cancel Payment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/payment/cancel",
+            "body": { "mode": "raw", "raw": "{\n  \"orderId\": \"{{orderId}}\"\n}" }
+          }
+        },
+        {
+          "name": "Webhook (Razorpay → server)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "x-razorpay-signature", "value": "<hmac-of-raw-body>" }],
+            "url": "{{baseUrl}}/payment/webhook",
+            "body": { "mode": "raw", "raw": "{\n  \"event\": \"payment.captured\",\n  \"payload\": { \"payment\": { \"entity\": { \"id\": \"pay_XXXX\", \"order_id\": \"{{orderId}}\" } } }\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        { "name": "My Tickets", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/ticket" } },
+        { "name": "Get Ticket by id", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/ticket/{{ticketId}}" } },
+        {
+          "name": "Validate Ticket (admin scan)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/ticket/validate",
+            "body": { "mode": "raw", "raw": "{\n  \"ticketId\": \"{{ticketId}}\"\n}" }
+          }
+        },
+        { "name": "Tickets by Showtime (admin)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/ticket/showtime/{{showtimeId}}" } },
+        { "name": "All Tickets (admin)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/ticket/admin/all?page=1&limit=20" } }
+      ]
+    },
+    {
+      "name": "Cancel / Refund",
+      "item": [
+        { "name": "Preview Cancellation", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/cancel/preview/{{ticketId}}" } },
+        {
+          "name": "Cancel Ticket",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/cancel/ticket/{{ticketId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"reason\": \"Change of plans\"\n}" }
+          }
+        },
+        { "name": "Admin Refunds", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/cancel/admin/refunds?page=1&limit=20" } }
+      ]
+    },
+    {
+      "name": "Waitlist",
+      "item": [
+        {
+          "name": "Join Waitlist",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/waitlist/{{showtimeId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"seatsRequested\": 2\n}" }
+          }
+        },
+        { "name": "My Status (showtime)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/waitlist/{{showtimeId}}" } },
+        { "name": "My Waitlists", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/waitlist/my" } },
+        {
+          "name": "Accept Offer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/waitlist/{{showtimeId}}/accept",
+            "body": { "mode": "raw", "raw": "{\n  \"choice\": \"book_and_stay\",\n  \"acceptedSeats\": 1\n}" }
+          }
+        },
+        { "name": "Decline Offer", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/waitlist/{{showtimeId}}/decline" } },
+        { "name": "Leave Waitlist", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/waitlist/{{showtimeId}}" } },
+        { "name": "Admin: All Waitlists", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/waitlist/admin/all" } },
+        { "name": "Admin: Waitlist Stats", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/waitlist/admin/stats" } }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        { "name": "Dashboard Stats", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/stats" } },
+        { "name": "Payments", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/payments?page=1&limit=20" } },
+        { "name": "Active Seat Locks", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/seatlocks" } },
+        { "name": "Cleanup Expired Locks", "request": { "method": "DELETE", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/seatlocks/cleanup" } },
+        { "name": "Admin Showtimes (incl unreleased)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/admin/showtimes" } }
+      ]
+    },
+    {
+      "name": "Email (admin)",
+      "item": [
+        { "name": "Email Logs", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/email/logs" } },
+        { "name": "Run Reminders", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/email/reminders/run" } }
+      ]
+    },
+    { "name": "Health", "request": { "method": "GET", "url": "{{baseUrl}}/health" } }
+  ]
+}

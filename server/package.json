@@ -1,0 +1,33 @@
+{
+  "name": "cinebooker-backend",
+  "version": "2.0.0",
+  "description": "CineBooker backend — MySQL (mysql2/promise, raw SQL, clean architecture)",
+  "main": "src/server.js",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest --runInBand",
+    "seed": "echo \"Load db/schema.sql then db/seed.sql into MySQL (see README / verification checklist)\""
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.11.0",
+    "node-cron": "^3.0.3",
+    "qrcode": "^1.5.3",
+    "razorpay": "^2.9.4",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "supertest": "^7.0.0"
+  }
+}
