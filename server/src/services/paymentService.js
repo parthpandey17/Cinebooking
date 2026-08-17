@@ -15,7 +15,16 @@ const logger = require('../utils/logger')
 const { labelToSeat, rowToNumber } = require('../utils/seats')
 
 const PRICE_PER_SEAT = config.pricePerSeat
-const razorpay = new Razorpay({ key_id: config.razorpay.keyId, key_secret: config.razorpay.keySecret })
+let razorpayClient = null
+
+const getRazorpayClient = () => {
+	if (razorpayClient) return razorpayClient
+	if (!config.razorpay.keyId || !config.razorpay.keySecret) {
+		throw new AppError('Razorpay keys are not configured', 503)
+	}
+	razorpayClient = new Razorpay({ key_id: config.razorpay.keyId, key_secret: config.razorpay.keySecret })
+	return razorpayClient
+}
 
 const seatWithinPlan = (label, spRow, spCol) => {
 	const s = labelToSeat(label)
@@ -131,7 +140,7 @@ const paymentService = {
 		await paymentRepository.cancelCreatedForUser(user.id, showtimeId)
 
 		const amountInPaise = seats.length * PRICE_PER_SEAT * 100
-		const order = await razorpay.orders.create({
+		const order = await getRazorpayClient().orders.create({
 			amount: amountInPaise, currency: 'INR',
 			receipt: `cb_${Date.now()}_${String(user.id).slice(-8)}`,
 			notes: { userId: String(user.id), showtimeId: String(showtimeId), seats: seats.join(',') }

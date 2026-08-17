@@ -53,19 +53,20 @@ INSERT INTO theaters (id, cinema_id, number, seat_plan_row, seat_plan_column) VA
 
 -- ── showtimes ────────────────────────────────────────────────────────────────
 -- A spread of upcoming showtimes over the next few days at 12:00 / 15:00 / 18:00.
-INSERT INTO showtimes (theater_id, movie_id, show_datetime, is_release) VALUES
-	(1, 1, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 12 HOUR, 1),
-	(1, 2, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 15 HOUR, 1),
-	(1, 3, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 18 HOUR, 1),
-	(2, 4, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 12 HOUR, 1),
-	(2, 5, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 15 HOUR, 1),
-	(4, 6, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 18 HOUR, 1),
-	(1, 1, DATE_ADD(DATE(NOW()), INTERVAL 2 DAY) + INTERVAL 12 HOUR, 1),
-	(2, 2, DATE_ADD(DATE(NOW()), INTERVAL 2 DAY) + INTERVAL 15 HOUR, 1),
-	(4, 3, DATE_ADD(DATE(NOW()), INTERVAL 2 DAY) + INTERVAL 18 HOUR, 1),
-	(7, 4, DATE_ADD(DATE(NOW()), INTERVAL 2 DAY) + INTERVAL 12 HOUR, 1),
+-- Explicit IDs keep the downstream booked-seat references stable.
+INSERT INTO showtimes (id, theater_id, movie_id, show_datetime, is_release) VALUES
+	(1, 1, 1, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 12 HOUR, 1),
+	(2, 1, 2, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 15 HOUR, 1),
+	(3, 1, 3, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 18 HOUR, 1),
+	(4, 2, 4, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 12 HOUR, 1),
+	(5, 2, 5, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 15 HOUR, 1),
+	(6, 4, 6, DATE_ADD(DATE(NOW()), INTERVAL 1 DAY) + INTERVAL 18 HOUR, 1),
+	(7, 1, 1, DATE_ADD(DATE(NOW()), INTERVAL 2 DAY) + INTERVAL 12 HOUR, 1),
+	(8, 2, 2, DATE_ADD(DATE(NOW()), INTERVAL 2 DAY) + INTERVAL 15 HOUR, 1),
+	(9, 4, 3, DATE_ADD(DATE(NOW()), INTERVAL 2 DAY) + INTERVAL 18 HOUR, 1),
+	(10, 7, 4, DATE_ADD(DATE(NOW()), INTERVAL 2 DAY) + INTERVAL 12 HOUR, 1),
 	-- one unreleased (admin-only visible) showtime
-	(3, 5, DATE_ADD(DATE(NOW()), INTERVAL 3 DAY) + INTERVAL 15 HOUR, 0);
+	(11, 3, 5, DATE_ADD(DATE(NOW()), INTERVAL 3 DAY) + INTERVAL 15 HOUR, 0);
 
 -- A few pre-booked seats on the first showtime to exercise availability/UI.
 INSERT INTO showtime_booked_seats (showtime_id, seat_row, seat_number, user_id) VALUES

@@ -17,10 +17,7 @@ import { toast } from 'react-toastify'
 import { io as socketIO } from 'socket.io-client'
 import Navbar from '../components/Navbar'
 import { AuthContext } from '../context/AuthContext'
-
-const API_BASE =
-    import.meta.env.VITE_API_BASE_URL ||
-    "https://cinebooking-wx4c.onrender.com";
+import { apiBaseUrl } from '../config/apiBaseUrl'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -549,7 +546,7 @@ const MyWaitlists = () => {
 	useEffect(() => {
 		if (!auth.id) return
 
-		const socket = socketIO(API_BASE, {
+		const socket = socketIO(apiBaseUrl, {
 			auth: { userId: auth.id },
 			reconnection: true,
 			reconnectionDelay: 1000,

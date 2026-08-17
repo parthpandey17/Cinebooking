@@ -12,7 +12,16 @@ const logger = require('../utils/logger')
 
 const CANCEL_CUTOFF_HOURS = parseInt(process.env.CANCEL_CUTOFF_HOURS || '6', 10)
 const CANCELLATION_FEE_PERCENT = parseFloat(process.env.CANCELLATION_FEE_PERCENT || '15')
-const razorpay = new Razorpay({ key_id: config.razorpay.keyId, key_secret: config.razorpay.keySecret })
+let razorpayClient = null
+
+const getRazorpayClient = () => {
+	if (razorpayClient) return razorpayClient
+	if (!config.razorpay.keyId || !config.razorpay.keySecret) {
+		throw new AppError('Razorpay keys are not configured', 503)
+	}
+	razorpayClient = new Razorpay({ key_id: config.razorpay.keyId, key_secret: config.razorpay.keySecret })
+	return razorpayClient
+}
 
 function computeCancellation(showtimeDate, originalAmountPaise) {
 	const now = new Date()
@@ -73,7 +82,7 @@ const cancelService = {
 
 		let refund
 		try {
-			refund = await razorpay.payments.refund(razorpayPaymentId, {
+			refund = await getRazorpayClient().payments.refund(razorpayPaymentId, {
 				amount: calc.refundAmountPaise, speed: 'normal',
 				notes: { ticketId: row.ticketId, reason: reason || 'Customer cancellation', cancellationFee: `${CANCELLATION_FEE_PERCENT}%` }
 			})

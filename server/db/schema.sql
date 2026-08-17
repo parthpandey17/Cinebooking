@@ -12,6 +12,18 @@
 --     parent (…_seats, waitlist_offered_seats, waitlist_partial_bookings) cascade.
 -- ============================================================================
 
+CREATE DATABASE IF NOT EXISTS cinebooker CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE USER IF NOT EXISTS 'cinebooker'@'localhost' IDENTIFIED BY 'cinebooker_pw';
+CREATE USER IF NOT EXISTS 'cinebooker'@'127.0.0.1' IDENTIFIED BY 'cinebooker_pw';
+
+GRANT ALL PRIVILEGES ON cinebooker.* TO 'cinebooker'@'localhost';
+GRANT ALL PRIVILEGES ON cinebooker.* TO 'cinebooker'@'127.0.0.1';
+
+FLUSH PRIVILEGES;
+
+USE cinebooker;
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS email_logs;

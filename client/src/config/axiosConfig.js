@@ -1,22 +1,10 @@
 import axios from 'axios'
+import { apiBaseUrl } from './apiBaseUrl'
 
-const PRODUCTION_API_URL = 'https://cinebooking-wx4c.onrender.com'
-
-const envUrl = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_SERVER_URL || '')
-	.trim()
-	.replace(/\/+$/, '')
-
-// DEV = local `npm run dev` only. Vercel preview/production builds always use Render.
-const apiBaseURL = import.meta.env.DEV
-	? envUrl || 'http://localhost:8080'
-	: envUrl && !envUrl.includes('localhost')
-		? envUrl
-		: PRODUCTION_API_URL
-
-console.log('API base URL:', apiBaseURL)
+console.log('API base URL:', apiBaseUrl)
 
 const instance = axios.create({
-	baseURL: apiBaseURL,
+	baseURL: apiBaseUrl,
 	withCredentials: true
 })
 
