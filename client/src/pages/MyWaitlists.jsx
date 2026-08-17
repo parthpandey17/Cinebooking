@@ -504,7 +504,7 @@ const TABS = ['Pending Offers', 'Active Waitlists', 'Past Waitlists']
 // ═════════════════════════════════════════════════════════════════════════════
 
 const MyWaitlists = () => {
-	const { auth }   = useContext(AuthContext)
+	const { auth, setAuth }   = useContext(AuthContext)
 	const navigate   = useNavigate()
 
 	const [entries, setEntries]       = useState([])
@@ -531,6 +531,12 @@ const MyWaitlists = () => {
 			const res = await axios.get('/waitlist/my')
 			setEntries(res.data.data || [])
 		} catch (err) {
+			const status = err?.response?.status
+			if (status === 401) {
+				setAuth({ id: null, username: null, email: null, role: null, token: null })
+				navigate('/login')
+				return
+			}
 			if (!silent) {
 				console.error('Failed to fetch waitlists:', err)
 				toast.error('Failed to load waitlists', { position: 'top-center' })

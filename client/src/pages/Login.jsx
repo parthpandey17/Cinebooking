@@ -30,10 +30,14 @@ const Login = ({ admin = false }) => {
 				autoClose: 2000,
 				pauseOnHover: false
 			})
-			// Store only non-sensitive user info in state.
-			// The JWT is in the httpOnly cookie set by the server — we never touch it.
 			const { id, username, email, role } = response.data.user
-			setAuth({ id, username, email, role })
+			setAuth({
+				id,
+				username,
+				email,
+				role,
+				token: response.data.token || null
+			})
 			navigate(admin ? '/admin' : '/')
 		} catch (error) {
 			console.error(error.response?.data)

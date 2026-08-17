@@ -135,6 +135,7 @@ const TicketCard = ({ ticket, onView, onCancel }) => {
 
 const Tickets = () => {
 	const { auth } = useContext(AuthContext)
+	const { setAuth } = useContext(AuthContext)
 	const navigate = useNavigate()
 
 	const [tickets, setTickets] = useState([])
@@ -146,6 +147,12 @@ const Tickets = () => {
 			const res = await axios.get('/ticket')
 			setTickets(res.data.data || [])
 		} catch (err) {
+			const status = err?.response?.status
+			if (status === 401) {
+				setAuth({ id: null, username: null, email: null, role: null, token: null })
+				navigate('/login')
+				return
+			}
 			console.error('fetchTickets error:', err)
 		} finally {
 			setLoading(false)

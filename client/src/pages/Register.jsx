@@ -1,12 +1,14 @@
 import axios from '../config/axiosConfig'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { AuthContext } from '../context/AuthContext'
 
 const Register = () => {
 	const navigate = useNavigate()
+	const { setAuth } = useContext(AuthContext)
 	const [errorsMessage, setErrorsMessage] = useState('')
 	const [isRegistering, SetIsRegistering] = useState(false)
 
@@ -24,6 +26,14 @@ const Register = () => {
 				position: 'top-center',
 				autoClose: 2000,
 				pauseOnHover: false
+			})
+			const { id, username, email, role } = response.data.user
+			setAuth({
+				id,
+				username,
+				email,
+				role,
+				token: response.data.token || null
 			})
 			navigate('/')
 		} catch (error) {
