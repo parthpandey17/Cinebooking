@@ -79,7 +79,7 @@ const showtimeRepository = {
 	// Booked seats for a showtime including who booked them (admin view).
 	async bookedSeatsWithUsers(showtimeId, conn) {
 		const [rows] = await R(conn).execute(
-			`SELECT b.seat_row AS row, b.seat_number AS number,
+			`SELECT b.seat_row AS \`row\`, b.seat_number AS \`number\`,
 			        u.id AS uid, u.username, u.email, u.role
 			 FROM showtime_booked_seats b LEFT JOIN users u ON u.id = b.user_id
 			 WHERE b.showtime_id = ?`, [showtimeId])

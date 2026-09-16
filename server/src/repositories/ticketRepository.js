@@ -36,7 +36,7 @@ const ticketRepository = {
 		if (!ticketPks.length) return {}
 		const ph = ticketPks.map(() => '?').join(',')
 		const [rows] = await R(conn).query(
-			`SELECT ticket_id AS tid, seat_row AS row, seat_number AS number FROM ticket_seats WHERE ticket_id IN (${ph})`, ticketPks)
+			`SELECT ticket_id AS tid, seat_row AS \`row\`, seat_number AS \`number\` FROM ticket_seats WHERE ticket_id IN (${ph})`, ticketPks)
 		const out = {}
 		for (const r of rows) (out[String(r.tid)] ||= []).push({ row: r.row, number: r.number })
 		return out

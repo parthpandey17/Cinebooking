@@ -36,7 +36,7 @@ const availabilityRepository = {
 		if (!showtimeIds.length) return {}
 		const ph = showtimeIds.map(() => '?').join(',')
 		const [rows] = await runner(conn).query(
-			`SELECT showtime_id AS sid, seat_row AS row, seat_number AS number
+			`SELECT showtime_id AS sid, seat_row AS \`row\`, seat_number AS \`number\`
 			 FROM showtime_booked_seats WHERE showtime_id IN (${ph})`, showtimeIds
 		)
 		const out = {}

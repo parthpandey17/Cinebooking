@@ -82,7 +82,7 @@ const userRepository = {
 		if (!rows.length) return []
 		const ids = rows.map((r) => r.ticketPk)
 		const [seatRows] = await runner(conn).query(
-			`SELECT ticket_id AS ticketPk, seat_row AS row, seat_number AS number
+			`SELECT ticket_id AS ticketPk, seat_row AS \`row\`, seat_number AS \`number\`
 			 FROM ticket_seats WHERE ticket_id IN (${ids.map(() => '?').join(',')})`, ids
 		)
 		const seatsByTicket = {}

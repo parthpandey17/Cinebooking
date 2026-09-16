@@ -33,7 +33,7 @@ const paymentRepository = {
 		return rows[0] || null
 	},
 	async seatsFor(paymentId, conn) {
-		const [rows] = await R(conn).execute('SELECT seat_row AS row, seat_number AS number FROM payment_seats WHERE payment_id = ?', [paymentId])
+		const [rows] = await R(conn).execute('SELECT seat_row AS \`row\`, seat_number AS \`number\` FROM payment_seats WHERE payment_id = ?', [paymentId])
 		return rows
 	},
 	async paidSeatLabels(showtimeId, conn) {
